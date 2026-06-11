@@ -56,11 +56,26 @@
 
 		.titlerow {
 			display: flex;
-			align-items: baseline;
+			align-items: center;
 			justify-content: space-between;
 			gap: 12px;
 			max-width: 1180px;
 			margin: 0 auto
+		}
+
+		.titlerow .brand {
+			display: flex;
+			align-items: center;
+			gap: 10px
+		}
+
+		.avatar {
+			width: 84px;
+			height: 84px;
+			border-radius: 50%;
+			object-fit: cover;
+			border: 3px solid var(--gold);
+			flex: none
 		}
 
 		h1 {
@@ -621,7 +636,10 @@
 <body>
 	<header>
 		<div class="titlerow">
-			<h1>World Cup <span class="y">2026</span> Tracker</h1>
+			<div class="brand">
+				<img class="avatar" src="pic.png" alt="App avatar">
+				<h1>World Cup <span class="y">2026</span> Tracker</h1>
+			</div>
 			<span class="saved" id="saved">Auto-saving</span>
 		</div>
 		<div class="tabs" role="tablist">
