@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>World Cup 2026 Tracker</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--ink: #0a1626;
+			--field: #102339;
+			--field2: #16304d;
+			--line: #22425f;
+			--gold: #f2c14e;
+			--win: #2ec27e;
+			--draw: #e6a23c;
+			--text: #e9eff6;
+			--muted: #86a0bb;
+			--display: "Oswald", "Arial Narrow", system-ui, sans-serif;
+			--body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+		}
+
+		* {
+			box-sizing: border-box
+		}
+
+		html,
+		body {
+			margin: 0;
+			background: var(--ink);
+			color: var(--text);
+			font-family: var(--body);
+			-webkit-text-size-adjust: 100%
+		}
+
+		body {
+			padding: 0 0 60px
+		}
+
+		a {
+			color: var(--gold)
+		}
+
+		/* ---- top bar ---- */
+		header {
+			position: sticky;
+			top: 0;
+			z-index: 20;
+			background: linear-gradient(180deg, #0c1c30, #0a1626);
+			border-bottom: 1px solid var(--line);
+			padding: 14px 16px 0;
+		}
+
+		.titlerow {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 12px;
+			max-width: 1180px;
+			margin: 0 auto
+		}
+
+		h1 {
+			font-family: var(--display);
+			font-weight: 700;
+			letter-spacing: .02em;
+			font-size: clamp(20px, 5vw, 30px);
+			margin: 0;
+			line-height: 1;
+			text-transform: uppercase;
+		}
+
+		h1 .y {
+			color: var(--gold)
+		}
+
+		.saved {
+			font-size: 11px;
+			color: var(--muted);
+			white-space: nowrap
+		}
+
+		.saved b {
+			color: var(--win)
+		}
+
+		.tabs {
+			display: flex;
+			gap: 6px;
+			max-width: 1180px;
+			margin: 12px auto 0;
+			padding-bottom: 0
+		}
+
+		.tab {
+			appearance: none;
+			border: 1px solid var(--line);
+			border-bottom: none;
+			background: transparent;
+			color: var(--muted);
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .04em;
+			font-size: 14px;
+			font-weight: 600;
+			padding: 9px 16px;
+			border-radius: 8px 8px 0 0;
+			cursor: pointer;
+		}
+
+		.tab[aria-selected="true"] {
+			background: var(--field);
+			color: var(--gold);
+			border-color: var(--line)
+		}
+
+		.tab:focus-visible {
+			outline: 2px solid var(--gold);
+			outline-offset: 2px
+		}
+
+		.resetall {
+			appearance: none;
+			border: 1px solid var(--line);
+			background: transparent;
+			color: var(--muted);
+			font-size: 12px;
+			padding: 5px 10px;
+			border-radius: 7px;
+			cursor: pointer;
+			margin-left: auto
+		}
+
+		.resetall:hover {
+			color: #ff8b8b;
+			border-color: #5a2630
+		}
+
+		main {
+			max-width: 1180px;
+			margin: 0 auto;
+			padding: 18px 14px
+		}
+
+		.hint {
+			color: var(--muted);
+			font-size: 13px;
+			margin: 2px 0 18px;
+			line-height: 1.5
+		}
+
+		.hint b {
+			color: var(--text);
+			font-weight: 600
+		}
+
+		/* ---- groups grid ---- */
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+			gap: 16px
+		}
+
+		.group {
+			background: var(--field);
+			border: 1px solid var(--line);
+			border-radius: 14px;
+			overflow: hidden;
+		}
+
+		.ghead {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 11px 14px;
+			background: linear-gradient(90deg, rgba(242, 193, 78, .14), transparent);
+			border-bottom: 1px solid var(--line);
+		}
+
+		.gbadge {
+			font-family: var(--display);
+			font-weight: 700;
+			color: var(--ink);
+			background: var(--gold);
+			width: 26px;
+			height: 26px;
+			border-radius: 7px;
+			display: grid;
+			place-items: center;
+			font-size: 16px;
+			flex: none
+		}
+
+		.gtitle {
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .06em;
+			font-size: 14px;
+			color: var(--muted)
+		}
+
+		/* ---- standings ---- */
+		table.standings {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px
+		}
+
+		.standings th,
+		.standings td {
+			padding: 6px 4px;
+			text-align: center
+		}
+
+		.standings th {
+			color: var(--muted);
+			font-weight: 500;
+			font-size: 10.5px;
+			text-transform: uppercase;
+			letter-spacing: .04em;
+			border-bottom: 1px solid var(--line)
+		}
+
+		.standings td:first-child,
+		.standings th:first-child {
+			text-align: left;
+			padding-left: 14px;
+			width: 42%
+		}
+
+		.standings td:last-child,
+		.standings th:last-child {
+			padding-right: 14px
+		}
+
+		.standings .pos {
+			color: var(--muted);
+			font-family: var(--display);
+			width: 18px;
+			display: inline-block
+		}
+
+		.standings tr.q1 td:first-child .pos,
+		.standings tr.q2 td:first-child .pos {
+			color: var(--win)
+		}
+
+		.standings tr.q3 td:first-child .pos {
+			color: var(--gold)
+		}
+
+		.standings .tn {
+			font-weight: 600
+		}
+
+		.standings .pts {
+			font-family: var(--display);
+			font-weight: 700;
+			color: var(--gold);
+			font-size: 15px
+		}
+
+		.standings tbody tr:not(:last-child) td {
+			border-bottom: 1px solid rgba(34, 66, 95, .45)
+		}
+
+		.qkey {
+			font-size: 10.5px;
+			color: var(--muted);
+			padding: 8px 14px;
+			border-top: 1px solid var(--line);
+			display: flex;
+			gap: 14px;
+			flex-wrap: wrap
+		}
+
+		.dot {
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			margin-right: 5px;
+			vertical-align: middle
+		}
+
+		.dot.g {
+			background: var(--win)
+		}
+
+		.dot.y {
+			background: var(--gold)
+		}
+
+		/* ---- matches ---- */
+		.matches {
+			padding: 6px 10px 12px
+		}
+
+		.mlabel {
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			font-size: 11px;
+			color: var(--muted);
+			padding: 10px 4px 4px
+		}
+
+		.match {
+			padding: 7px 4px 4px;
+			border-top: 1px solid rgba(34, 66, 95, .4)
+		}
+
+		.match:first-of-type {
+			border-top: none
+		}
+
+		.cap {
+			font-size: 10.5px;
+			color: var(--muted);
+			text-align: center;
+			margin-bottom: 4px;
+			letter-spacing: .02em
+		}
+
+		.teams {
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+			align-items: stretch;
+			gap: 6px
+		}
+
+		.side {
+			appearance: none;
+			border: 1px solid var(--line);
+			background: var(--field2);
+			color: var(--text);
+			border-radius: 9px;
+			cursor: pointer;
+			padding: 8px 10px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			min-height: 46px;
+			transition: background .14s, border-color .14s, color .14s;
+			font-family: inherit
+		}
+
+		.side.home {
+			justify-content: flex-end;
+			text-align: right
+		}
+
+		.side.away {
+			justify-content: flex-start;
+			text-align: left
+		}
+
+		.side .tname {
+			font-weight: 600;
+			font-size: 14px;
+			line-height: 1.05
+		}
+
+		.side .sc {
+			font-family: var(--display);
+			font-weight: 700;
+			font-size: 22px;
+			min-width: 20px;
+			text-align: center;
+			color: var(--muted)
+		}
+
+		.side.played .sc {
+			color: var(--text)
+		}
+
+		.side.win {
+			background: rgba(46, 194, 126, .16);
+			border-color: var(--win)
+		}
+
+		.side.win .sc {
+			color: var(--win)
+		}
+
+		.side.draw {
+			background: rgba(230, 162, 60, .13);
+			border-color: var(--draw)
+		}
+
+		.side.draw .sc {
+			color: var(--draw)
+		}
+
+		.side:focus-visible {
+			outline: 2px solid var(--gold);
+			outline-offset: 2px
+		}
+
+		.colon {
+			display: grid;
+			place-items: center;
+			color: var(--muted);
+			font-family: var(--display);
+			font-size: 18px;
+			padding: 0 2px
+		}
+
+		.ctrls {
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+			gap: 6px;
+			margin-top: 5px
+		}
+
+		.mini {
+			appearance: none;
+			border: 1px solid var(--line);
+			background: transparent;
+			color: var(--muted);
+			border-radius: 7px;
+			font-size: 12px;
+			padding: 3px 0;
+			cursor: pointer;
+			font-family: inherit
+		}
+
+		.mini.h {
+			justify-self: end;
+			width: 42px
+		}
+
+		.mini.a {
+			justify-self: start;
+			width: 42px
+		}
+
+		.mini.clr {
+			font-size: 11px;
+			padding: 3px 12px
+		}
+
+		.mini:hover {
+			color: var(--text);
+			border-color: var(--gold)
+		}
+
+		.mini:disabled {
+			opacity: .3;
+			cursor: default
+		}
+
+		/* ---- knockout ---- */
+		.ko-wrap {
+			overflow-x: auto;
+			padding-bottom: 8px
+		}
+
+		.ko-rounds {
+			display: flex;
+			gap: 14px;
+			min-width: max-content;
+			align-items: stretch
+		}
+
+		.ko-col {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+			gap: 10px;
+			min-width: 188px
+		}
+
+		.ko-col h3 {
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .06em;
+			font-size: 12px;
+			color: var(--gold);
+			margin: 0 0 2px;
+			text-align: center;
+			position: sticky;
+			top: 0
+		}
+
+		.tie {
+			background: var(--field);
+			border: 1px solid var(--line);
+			border-radius: 11px;
+			padding: 7px;
+			display: flex;
+			flex-direction: column;
+			gap: 5px
+		}
+
+		.tie.final {
+			border-color: var(--gold);
+			background: linear-gradient(180deg, rgba(242, 193, 78, .1), var(--field))
+		}
+
+		.slot {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			border: 1px solid var(--line);
+			background: var(--field2);
+			border-radius: 8px;
+			padding: 4px 5px;
+			cursor: pointer;
+			transition: background .14s, border-color .14s
+		}
+
+		.slot input {
+			flex: 1;
+			min-width: 0;
+			background: transparent;
+			border: none;
+			color: var(--text);
+			font: inherit;
+			font-weight: 600;
+			font-size: 13px;
+			padding: 3px 2px;
+			outline: none
+		}
+
+		.slot input::placeholder {
+			color: #5b7390;
+			font-weight: 400
+		}
+
+		.slot .pick {
+			width: 24px;
+			height: 24px;
+			flex: none;
+			border: 1px solid var(--line);
+			border-radius: 6px;
+			background: transparent;
+			color: var(--muted);
+			cursor: pointer;
+			font-size: 13px;
+			line-height: 1;
+			display: grid;
+			place-items: center
+		}
+
+		.slot.win {
+			background: rgba(46, 194, 126, .16);
+			border-color: var(--win)
+		}
+
+		.slot.win .pick {
+			background: var(--win);
+			color: var(--ink);
+			border-color: var(--win)
+		}
+
+		.tie .vs {
+			text-align: center;
+			font-size: 9px;
+			color: var(--muted);
+			letter-spacing: .1em;
+			margin: -2px 0
+		}
+
+		.ko-note {
+			font-size: 12px;
+			color: var(--muted);
+			margin: 0 0 14px;
+			line-height: 1.5
+		}
+
+		.champ {
+			margin-top: 12px;
+			text-align: center;
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			font-size: 13px;
+			color: var(--muted)
+		}
+
+		.champ b {
+			display: block;
+			font-size: 26px;
+			color: var(--gold);
+			letter-spacing: .04em;
+			margin-top: 2px
+		}
+
+		@media (max-width:480px) {
+
+			.standings td:first-child,
+			.standings th:first-child {
+				width: 38%
+			}
+
+			.side .tname {
+				font-size: 13px
+			}
+
+			main {
+				padding: 14px 10px
+			}
+
+			.grid {
+				grid-template-columns: 1fr
+			}
+		}
+
+		@media (prefers-reduced-motion:reduce) {
+			* {
+				transition: none !important
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<header>
+		<div class="titlerow">
+			<h1>World Cup <span class="y">2026</span> Tracker</h1>
+			<span class="saved" id="saved">Auto-saving</span>
+		</div>
+		<div class="tabs" role="tablist">
+			<button class="tab" id="tab-groups" role="tab" aria-selected="true" aria-controls="view-groups">Group
+				Stage</button>
+			<button class="tab" id="tab-ko" role="tab" aria-selected="false" aria-controls="view-ko">Knockout</button>
+			<button class="resetall" id="resetAll" title="Clear every result">Reset all</button>
+		</div>
+	</header>
+
+	<main>
+		<section id="view-groups" role="tabpanel" aria-labelledby="tab-groups">
+			<p class="hint">Tap a team to add a goal — the higher score wins and the table re-sorts itself. Use <b>−</b>
+				to fix a slip or <b>Clear</b> to set a match back to unplayed. Equal scores count as a draw.</p>
+			<div class="grid" id="groups"></div>
+		</section>
+
+		<section id="view-ko" role="tabpanel" aria-labelledby="tab-ko" hidden>
+			<p class="ko-note">Type the qualifiers into the Round of 32 slots, then tap the ✓ to pick a winner — they
+				advance to the next round automatically. Slot hints (1A, 2B…) follow the wallchart layout.</p>
+			<div class="ko-wrap">
+				<div class="ko-rounds" id="ko"></div>
+			</div>
+			<div class="champ">Champions<b id="champ">— — —</b></div>
+		</section>
+	</main>
+
+	<script>
+		/* ---------------- DATA (from the wallchart) ---------------- */
+		const GROUPS = {
+			A: {
+				teams: ["Mexico", "South Africa", "South Korea", "Czechia"],
+				m: [[0, 1, "Thu Jun 11"], [2, 3, "Fri Jun 12"], [3, 1, "Thu Jun 18"], [0, 2, "Fri Jun 19"], [1, 2, "Thu Jun 25"], [3, 0, "Thu Jun 25"]]
+			},
+			B: {
+				teams: ["Canada", "Bosnia", "Qatar", "Switzerland"],
+				m: [[0, 1, "Fri Jun 12"], [2, 3, "Sat Jun 13"], [3, 1, "Thu Jun 18"], [0, 2, "Thu Jun 18"], [3, 0, "Wed Jun 24"], [1, 2, "Wed Jun 24"]]
+			},
+			C: {
+				teams: ["Brazil", "Morocco", "Haiti", "Scotland"],
+				m: [[0, 1, "Sat Jun 13"], [2, 3, "Sun Jun 14"], [3, 1, "Fri Jun 19"], [0, 2, "Sat Jun 20"], [1, 2, "Wed Jun 24"], [3, 0, "Wed Jun 24"]]
+			},
+			D: {
+				teams: ["USA", "Paraguay", "Australia", "Turkey"],
+				m: [[0, 1, "Sat Jun 13"], [2, 3, "Sun Jun 14"], [0, 2, "Fri Jun 19"], [3, 1, "Sat Jun 20"], [3, 0, "Fri Jun 26"], [1, 2, "Fri Jun 26"]]
+			},
+			E: {
+				teams: ["Germany", "Curacao", "Ivory Coast", "Ecuador"],
+				m: [[0, 1, "Sun Jun 14"], [2, 3, "Mon Jun 15"], [0, 2, "Sat Jun 20"], [3, 1, "Sun Jun 21"], [1, 2, "Thu Jun 25"], [3, 0, "Thu Jun 25"]]
+			},
+			F: {
+				teams: ["Holland", "Japan", "Sweden", "Tunisia"],
+				m: [[0, 1, "Sun Jun 14"], [2, 3, "Mon Jun 15"], [0, 2, "Sat Jun 20"], [3, 1, "Sun Jun 21"], [3, 0, "Fri Jun 26"], [1, 2, "Fri Jun 26"]]
+			},
+			G: {
+				teams: ["Belgium", "Egypt", "Iran", "New Zealand"],
+				m: [[0, 1, "Mon Jun 15"], [2, 3, "Tue Jun 16"], [0, 2, "Sun Jun 21"], [3, 1, "Mon Jun 22"], [3, 0, "Sat Jun 27"], [1, 2, "Sat Jun 27"]]
+			},
+			H: {
+				teams: ["Spain", "Cape Verde", "Saudi Arabia", "Uruguay"],
+				m: [[0, 1, "Mon Jun 15"], [2, 3, "Mon Jun 15"], [0, 2, "Sat Jun 20"], [3, 1, "Sun Jun 21"], [1, 2, "Sat Jun 27"], [3, 0, "Sat Jun 27"]]
+			},
+			I: {
+				teams: ["France", "Senegal", "Iraq", "Norway"],
+				m: [[0, 1, "Tue Jun 16"], [2, 3, "Tue Jun 16"], [0, 2, "Mon Jun 22"], [3, 1, "Tue Jun 23"], [3, 0, "Fri Jun 26"], [1, 2, "Fri Jun 26"]]
+			},
+			J: {
+				teams: ["Argentina", "Algeria", "Austria", "Jordan"],
+				m: [[0, 1, "Wed Jun 17"], [2, 3, "Wed Jun 17"], [0, 2, "Mon Jun 22"], [3, 1, "Tue Jun 23"], [1, 2, "Sun Jun 28"], [3, 0, "Sun Jun 28"]]
+			},
+			K: {
+				teams: ["Portugal", "DR Congo", "Uzbekistan", "Colombia"],
+				m: [[0, 1, "Wed Jun 17"], [2, 3, "Thu Jun 18"], [0, 2, "Tue Jun 23"], [3, 1, "Wed Jun 24"], [3, 0, "Sun Jun 28"], [1, 2, "Sun Jun 28"]]
+			},
+			L: {
+				teams: ["England", "Croatia", "Ghana", "Panama"],
+				m: [[0, 1, "Tue Jun 16"], [2, 3, "Thu Jun 18"], [0, 2, "Mon Jun 23"], [3, 1, "Wed Jun 24"], [3, 0, "Sun Jun 28"], [1, 2, "Sun Jun 28"]]
+			},
+		};
+		const GKEYS = Object.keys(GROUPS);
+
+		/* Round-of-32 slot hints, following the wallchart's left/right flow */
+		const R32_HINTS = [
+			"1E", "3 (A/B/C)", "1C", "2F", "1H", "3 (G/H/I/J)", "1F", "2C",
+			"2A", "2B", "1K", "2L", "1J", "2 (G/H)", "1L", "2J",
+			"1I", "2K", "1D", "2 (E/F)", "1A", "2 (C/D)", "1B", "2 (A/B)",
+			"1G", "2I", "2H", "1 (G/H)", "2D", "2E", "2G", "2 (K/L)"
+		];
+		const ROUND_NAMES = ["Round of 32", "Round of 16", "Quarter-final", "Semi-final", "Final"];
+
+		/* ---------------- STATE + STORAGE ---------------- */
+		let state = { g: {}, koTeams: Array(32).fill(""), koPicks: {} };
+		let savePending = false;
+		const savedEl = document.getElementById('saved');
+
+		const STORAGE_KEY = 'wc2026';
+		async function loadState() {
+			try {
+				const raw = localStorage.getItem(STORAGE_KEY);
+				if (raw) { const s = JSON.parse(raw); state = Object.assign(state, s); }
+			} catch (e) { /* first run or storage unavailable -> in-memory only */ }
+		}
+		let saveTimer = null;
+		function save() {
+			savePending = true; savedEl.innerHTML = 'Saving…';
+			clearTimeout(saveTimer);
+			saveTimer = setTimeout(() => {
+				try {
+					localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+					savedEl.innerHTML = '<b>✓</b> Saved';
+				} catch (e) { savedEl.innerHTML = 'Save failed'; }
+				savePending = false;
+			}, 250);
+		}
+
+		/* ---------------- GROUP RENDER ---------------- */
+		const groupsEl = document.getElementById('groups');
+
+		function matchScore(gk, idx) { return (state.g[gk] && state.g[gk][idx]) || null; }
+		function setScore(gk, idx, sc) {
+			state.g[gk] = state.g[gk] || {};
+			if (sc === null) delete state.g[gk][idx]; else state.g[gk][idx] = sc;
+			save(); renderGroup(gk);
+		}
+
+		function computeStandings(gk) {
+			const g = GROUPS[gk];
+			const t = g.teams.map((name, i) => ({ i, name, P: 0, W: 0, D: 0, L: 0, GF: 0, GA: 0, Pts: 0 }));
+			g.m.forEach((mm, idx) => {
+				const sc = matchScore(gk, idx); if (!sc) return;
+				const h = t[mm[0]], a = t[mm[1]];
+				h.P++; a.P++; h.GF += sc.h; h.GA += sc.a; a.GF += sc.a; a.GA += sc.h;
+				if (sc.h > sc.a) { h.W++; a.L++; h.Pts += 3; }
+				else if (sc.h < sc.a) { a.W++; h.L++; a.Pts += 3; }
+				else { h.D++; a.D++; h.Pts++; a.Pts++; }
+			});
+			t.forEach(x => x.GD = x.GF - x.GA);
+			t.sort((x, y) => y.Pts - x.Pts || y.GD - x.GD || y.GF - x.GF || x.name.localeCompare(y.name));
+			return t;
+		}
+
+		function renderGroup(gk) {
+			const g = GROUPS[gk];
+			let card = document.getElementById('grp-' + gk);
+			if (!card) { card = document.createElement('div'); card.className = 'group'; card.id = 'grp-' + gk; groupsEl.appendChild(card); }
+			const st = computeStandings(gk);
+			let rows = st.map((r, p) => {
+				const cls = p === 0 ? 'q1' : p === 1 ? 'q2' : p === 2 ? 'q3' : '';
+				return `<tr class="${cls}"><td><span class="pos">${p + 1}</span><span class="tn">${r.name}</span></td>
+      <td>${r.P}</td><td>${r.W}</td><td>${r.D}</td><td>${r.L}</td><td>${r.GD > 0 ? '+' : ''}${r.GD}</td>
+      <td class="pts">${r.Pts}</td></tr>`;
+			}).join('');
+
+			let matches = g.m.map((mm, idx) => {
+				const sc = matchScore(gk, idx);
+				const hN = g.teams[mm[0]], aN = g.teams[mm[1]];
+				const played = !!sc;
+				let hCls = 'side home', aCls = 'side away';
+				if (played) {
+					hCls += ' played'; aCls += ' played';
+					if (sc.h > sc.a) hCls += ' win'; else if (sc.h < sc.a) aCls += ' win';
+					else { hCls += ' draw'; aCls += ' draw'; }
+				}
+				const hS = played ? sc.h : '–', aS = played ? sc.a : '–';
+				return `<div class="match" data-g="${gk}" data-i="${idx}">
+      <div class="cap">${mm[2]}</div>
+      <div class="teams">
+        <button class="${hCls}" data-side="h"><span class="tname">${hN}</span><span class="sc">${hS}</span></button>
+        <span class="colon">:</span>
+        <button class="${aCls}" data-side="a"><span class="sc">${aS}</span><span class="tname">${aN}</span></button>
+      </div>
+      <div class="ctrls">
+        <button class="mini h" data-act="dec" data-s="h" ${played && sc.h > 0 ? '' : 'disabled'}>−</button>
+        <button class="mini clr" data-act="clr">${played ? 'Clear' : '—'}</button>
+        <button class="mini a" data-act="dec" data-s="a" ${played && sc.a > 0 ? '' : 'disabled'}>−</button>
+      </div>
+    </div>`;
+			}).join('');
+
+			card.innerHTML = `
+    <div class="ghead"><span class="gbadge">${gk}</span><span class="gtitle">Group ${gk}</span></div>
+    <table class="standings">
+      <thead><tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="qkey"><span><span class="dot g"></span>Top 2 advance</span><span><span class="dot y"></span>Best 3rd-place contenders</span></div>
+    <div class="matches"><div class="mlabel">Fixtures</div>${matches}</div>`;
+		}
+
+		groupsEl.addEventListener('click', e => {
+			const mEl = e.target.closest('.match'); if (!mEl) return;
+			const gk = mEl.dataset.g, idx = +mEl.dataset.i;
+			let sc = matchScore(gk, idx);
+			const sideBtn = e.target.closest('.side');
+			const ctrl = e.target.closest('.mini');
+			if (sideBtn) {
+				if (!sc) sc = { h: 0, a: 0 };
+				if (sideBtn.dataset.side === 'h') sc = { h: sc.h + 1, a: sc.a }; else sc = { h: sc.h, a: sc.a + 1 };
+				setScore(gk, idx, sc); return;
+			}
+			if (ctrl) {
+				const act = ctrl.dataset.act;
+				if (act === 'clr') { setScore(gk, idx, null); return; }
+				if (act === 'dec' && sc) {
+					if (ctrl.dataset.s === 'h' && sc.h > 0) sc = { h: sc.h - 1, a: sc.a };
+					else if (ctrl.dataset.s === 'a' && sc.a > 0) sc = { h: sc.h, a: sc.a - 1 };
+					setScore(gk, idx, sc);
+				}
+			}
+		});
+
+		/* ---------------- KNOCKOUT ---------------- */
+		const koEl = document.getElementById('ko');
+		const champEl = document.getElementById('champ');
+
+		/* tree: round r has 16/(2^r) matches. match m in round r has two feeders. */
+		function teamAt(round, slot) {
+			// returns name string for a given round/slot (slot = team position within round)
+			if (round === 0) return state.koTeams[slot] || "";
+			const match = Math.floor(slot / 2); // which match in previous round produced this
+			const prevMatch = slot; // slot index in round r equals match index in round r-1... handle below
+			return ""; // placeholder; computed in render via winners map
+		}
+
+		function renderKO() {
+			// Build winners per round from picks. winners[r] = array of names entering round r.
+			const entrants = []; entrants[0] = state.koTeams.slice(0, 32);
+			for (let r = 0; r < 4; r++) {
+				const inN = entrants[r], out = [];
+				const matches = inN.length / 2;
+				for (let m = 0; m < matches; m++) {
+					const a = inN[2 * m] || "", b = inN[2 * m + 1] || "";
+					const pick = state.koPicks[r + '-' + m];
+					out[m] = pick === 'a' ? a : pick === 'b' ? b : "";
+				}
+				entrants[r + 1] = out;
+			}
+
+			let html = '';
+			for (let r = 0; r < 5; r++) {
+				html += `<div class="ko-col"><h3>${ROUND_NAMES[r]}</h3>`;
+				const inN = entrants[r];
+				const matches = r < 4 ? inN.length / 2 : 1;
+				for (let m = 0; m < matches; m++) {
+					const a = inN[2 * m] ?? "", b = inN[2 * m + 1] ?? "";
+					const pick = state.koPicks[r + '-' + m];
+					const isFinal = r === 4;
+					const slotA = koSlot(r, m, 'a', a, pick === 'a', r === 0, 2 * m);
+					const slotB = koSlot(r, m, 'b', b, pick === 'b', r === 0, 2 * m + 1);
+					html += `<div class="tie${isFinal ? ' final' : ''}">${slotA}<div class="vs">VS</div>${slotB}</div>`;
+				}
+				html += '</div>';
+			}
+			koEl.innerHTML = html;
+			const finalPick = state.koPicks['4-0'];
+			const champion = finalPick === 'a' ? (entrants[4][0]) : finalPick === 'b' ? (entrants[4][1]) : "";
+			champEl.textContent = champion || "— — —";
+		}
+
+		function koSlot(r, m, side, name, isWin, editable, teamIndex) {
+			const ph = editable ? (R32_HINTS[teamIndex] || "Team") : "—";
+			const val = name || "";
+			const input = editable
+				? `<input data-ti="${teamIndex}" value="${escapeHtml(val)}" placeholder="${ph}" aria-label="Round of 32 team">`
+				: `<input value="${escapeHtml(val)}" placeholder="${ph}" readonly tabindex="-1" aria-label="Qualified team">`;
+			return `<div class="slot${isWin ? ' win' : ''}" data-r="${r}" data-m="${m}" data-side="${side}">
+    ${input}<button class="pick" data-pick="1" title="Pick winner">✓</button></div>`;
+		}
+		function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+		koEl.addEventListener('click', e => {
+			const pick = e.target.closest('.pick'); if (!pick) return;
+			const slot = pick.closest('.slot');
+			const r = +slot.dataset.r, m = +slot.dataset.m, side = slot.dataset.side;
+			const key = r + '-' + m;
+			state.koPicks[key] = (state.koPicks[key] === side) ? undefined : side;
+			if (state.koPicks[key] === undefined) delete state.koPicks[key];
+			clearDownstream(r, m);
+			save(); renderKO();
+		});
+		koEl.addEventListener('input', e => {
+			const inp = e.target.closest('input[data-ti]'); if (!inp) return;
+			state.koTeams[+inp.dataset.ti] = inp.value;
+			// changing a name shouldn't blow away picks, but advanced names refresh via re-render on blur
+			save();
+		});
+		koEl.addEventListener('change', e => { if (e.target.closest('input[data-ti]')) renderKO(); });
+
+		function clearDownstream(r, m) {
+			// when a pick changes, invalidate dependent later-round picks
+			let cm = Math.floor(m / 2);
+			for (let rr = r + 1; rr <= 4; rr++) {
+				delete state.koPicks[rr + '-' + cm];
+				cm = Math.floor(cm / 2);
+			}
+		}
+
+		/* ---------------- TABS ---------------- */
+		const tabG = document.getElementById('tab-groups'), tabK = document.getElementById('tab-ko');
+		const viewG = document.getElementById('view-groups'), viewK = document.getElementById('view-ko');
+		function selectTab(which) {
+			const g = which === 'g';
+			tabG.setAttribute('aria-selected', g); tabK.setAttribute('aria-selected', !g);
+			viewG.hidden = !g; viewK.hidden = g;
+			if (!g) renderKO();
+		}
+		tabG.onclick = () => selectTab('g'); tabK.onclick = () => selectTab('k');
+
+		/* ---------------- RESET ---------------- */
+		document.getElementById('resetAll').onclick = () => {
+			if (!confirm('Clear every recorded result and knockout pick? This cannot be undone.')) return;
+			state = { g: {}, koTeams: Array(32).fill(""), koPicks: {} };
+			save();
+			GKEYS.forEach(renderGroup); renderKO();
+		};
+
+		/* ---------------- INIT ---------------- */
+		(async function () {
+			await loadState();
+			if (!Array.isArray(state.koTeams) || state.koTeams.length !== 32) state.koTeams = Array(32).fill("");
+			if (!state.g) state.g = {};
+			if (!state.koPicks) state.koPicks = {};
+			GKEYS.forEach(renderGroup);
+			renderKO();
+			savedEl.innerHTML = '<b>✓</b> Saved';
+		})();
+	</script>
+</body>
+
+</html>
