@@ -1355,7 +1355,7 @@
 			});
 		});
 
-		groupsEl.addEventListener('click', e => {
+		document.addEventListener('click', e => {
 			const mEl = e.target.closest('.match'); if (!mEl) return;
 			const gk = mEl.dataset.g, idx = +mEl.dataset.i;
 			let sc = matchScore(gk, idx);
