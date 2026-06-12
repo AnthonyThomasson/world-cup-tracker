@@ -1317,7 +1317,7 @@
 			let matches = featuredMatches.join('');
 			if (featuredIdx !== undefined) {
 				const label = gk === 'J' ? 'Putos' : 'Hosers';
-				matches += `<details class="other-matches"><summary>${label}</summary>${otherMatches.join('')}</details>`;
+				matches += `<details class="other-matches" id="other-${gk}"><summary>${label}</summary>${otherMatches.join('')}</details>`;
 			} else {
 				matches += otherMatches.join('');
 			}
@@ -1343,6 +1343,17 @@
     <div class="qkey"><span><span class="dot g"></span>Top 2 advance</span><span><span class="dot y"></span>Best 3rd-place contenders</span></div>
     <div class="matches"><div class="mlabel">Fixtures</div>${matches}</div>`;
 		}
+
+		document.addEventListener('click', e => {
+			const summary = e.target.closest('.other-matches > summary');
+			if (!summary) return;
+			e.preventDefault();
+			const open = !summary.parentElement.open;
+			['B', 'J'].forEach(gk => {
+				const d = document.getElementById('other-' + gk);
+				if (d) d.open = open;
+			});
+		});
 
 		groupsEl.addEventListener('click', e => {
 			const mEl = e.target.closest('.match'); if (!mEl) return;
