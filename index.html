@@ -219,6 +219,7 @@
 		.ico-flag-badge {
 			width: 16px;
 			height: 12px;
+			object-fit: cover;
 			border-radius: 2px;
 			box-shadow: 0 0 0 1px var(--line)
 		}
@@ -231,6 +232,11 @@
 
 		.flagname.argy {
 			color: var(--celeste);
+			font-weight: 700
+		}
+
+		.flagname.cany {
+			color: #ff8478;
 			font-weight: 700
 		}
 
@@ -342,6 +348,40 @@
 
 		.other-groups .grid {
 			margin-top: 10px
+		}
+
+		.other-matches {
+			margin-top: 8px;
+			border-top: 1px solid rgba(34, 66, 95, .4);
+			padding-top: 2px
+		}
+
+		.other-matches summary {
+			cursor: pointer;
+			padding: 8px 4px;
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .06em;
+			font-size: 14px;
+			color: var(--muted);
+			list-style: none
+		}
+
+		.other-matches summary::-webkit-details-marker {
+			display: none
+		}
+
+		.other-matches summary::before {
+			content: "▸ ";
+			color: var(--gold)
+		}
+
+		.other-matches[open] summary::before {
+			content: "▾ "
+		}
+
+		.other-matches .match:first-of-type {
+			border-top: 1px solid rgba(34, 66, 95, .4)
 		}
 
 		.group {
@@ -561,10 +601,7 @@
 
 		.match {
 			padding: 7px 4px 4px;
-			border-top: 1px solid rgba(34, 66, 95, .4);
-			border-left: 3px solid transparent;
-			margin-left: -3px;
-			padding-left: 7px
+			border-top: 1px solid rgba(34, 66, 95, .4)
 		}
 
 		.match:first-of-type {
@@ -572,12 +609,10 @@
 		}
 
 		.match.acc-arg {
-			border-left-color: var(--celeste);
 			background: rgba(127, 196, 240, .06)
 		}
 
 		.match.acc-can {
-			border-left-color: var(--canada-red);
 			background: rgba(213, 43, 30, .07)
 		}
 
@@ -1249,7 +1284,8 @@
 			}).join('');
 
 			const featuredIdx = FEATURED_TEAM_IDX[gk];
-			let matches = g.m.map((mm, idx) => {
+			const featuredMatches = [], otherMatches = [];
+			g.m.forEach((mm, idx) => {
 				const sc = matchScore(gk, idx);
 				const hN = g.teams[mm[0]], aN = g.teams[mm[1]];
 				const played = !!sc;
@@ -1261,10 +1297,9 @@
 				}
 				const hS = played ? sc.h : '–', aS = played ? sc.a : '–';
 				let mCls = 'match';
-				if (featuredIdx !== undefined && (mm[0] === featuredIdx || mm[1] === featuredIdx)) {
-					mCls += gk === 'B' ? ' acc-can' : ' acc-arg';
-				}
-				return `<div class="${mCls}" data-g="${gk}" data-i="${idx}">
+				const isFeatured = featuredIdx !== undefined && (mm[0] === featuredIdx || mm[1] === featuredIdx);
+				if (isFeatured) mCls += gk === 'B' ? ' acc-can' : ' acc-arg';
+				const html = `<div class="${mCls}" data-g="${gk}" data-i="${idx}">
       <div class="cap">${mm[2]}</div>
       <div class="teams">
         <button class="${hCls}" data-side="h"><span class="tname">${teamLabel(hN)}</span><span class="sc">${hS}</span></button>
@@ -1277,7 +1312,15 @@
         <button class="mini a" data-act="dec" data-s="a" ${played && sc.a > 0 ? '' : 'disabled'}>−</button>
       </div>
     </div>`;
-			}).join('');
+				(isFeatured ? featuredMatches : otherMatches).push(html);
+			});
+			let matches = featuredMatches.join('');
+			if (featuredIdx !== undefined) {
+				const label = gk === 'J' ? 'Putos' : 'Hosers';
+				matches += `<details class="other-matches"><summary>${label}</summary>${otherMatches.join('')}</details>`;
+			} else {
+				matches += otherMatches.join('');
+			}
 
 			const isArg = gk === 'J', isCan = gk === 'B';
 			card.classList.toggle('grp-arg', isArg);
@@ -1390,6 +1433,9 @@
 		function teamLabel(name) {
 			if (name === 'Argentina') {
 				return `<span class="flagname argy"><svg class="ico ico-flag-badge" viewBox="0 0 30 20" aria-hidden="true"><use href="#ic-flag"/></svg>${escapeHtml(name)}</span>`;
+			}
+			if (name === 'Canada') {
+				return `<span class="flagname cany"><img class="ico-flag-badge" src="flags/canada.png" alt="">${escapeHtml(name)}</span>`;
 			}
 			return escapeHtml(name);
 		}
