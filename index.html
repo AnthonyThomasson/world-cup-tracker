@@ -4,27 +4,44 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>World Cup 2026 Tracker</title>
+	<title>World Cup 2026 Tracker — ¡Vamos Argentina!</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 	<style>
 		:root {
-			--ink: #0a1626;
-			--field: #102339;
-			--field2: #16304d;
-			--line: #22425f;
+			--ink: #071c33;
+			--field: #0f3a63;
+			--field2: #154e82;
+			--line: #2d6694;
+			--celeste: #7fc4f0;
+			--celeste-deep: #3a8bc7;
+			--canada-red: #d52b1e;
+			--canada-red-deep: #a4170c;
 			--gold: #f2c14e;
 			--win: #2ec27e;
 			--draw: #e6a23c;
-			--text: #e9eff6;
-			--muted: #86a0bb;
+			--text: #eef6ff;
+			--muted: #9cc3e6;
 			--display: "Oswald", "Arial Narrow", system-ui, sans-serif;
 			--body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 		}
 
 		* {
 			box-sizing: border-box
+		}
+
+		.bg-sun {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			width: min(70vw, 560px);
+			height: min(70vw, 560px);
+			transform: translate(-50%, -50%);
+			color: var(--gold);
+			opacity: .06;
+			pointer-events: none;
+			z-index: 0;
 		}
 
 		html,
@@ -49,9 +66,16 @@
 			position: sticky;
 			top: 0;
 			z-index: 20;
-			background: linear-gradient(180deg, #0c1c30, #0a1626);
+			background: linear-gradient(180deg, #1c5a8c, var(--ink));
 			border-bottom: 1px solid var(--line);
 			padding: 14px 16px 0;
+		}
+
+		.flag-stripe {
+			height: 4px;
+			margin: -14px -16px 12px;
+			background: linear-gradient(90deg,
+					var(--celeste) 0 33.33%, #fff 33.33% 66.66%, var(--celeste) 66.66% 100%);
 		}
 
 		.titlerow {
@@ -69,13 +93,30 @@
 			gap: 10px
 		}
 
+		.avatar-wrap {
+			position: relative;
+			flex: none;
+			width: 84px;
+			height: 84px
+		}
+
 		.avatar {
 			width: 84px;
 			height: 84px;
 			border-radius: 50%;
 			object-fit: cover;
 			border: 3px solid var(--gold);
-			flex: none
+			display: block
+		}
+
+		.avatar-flag {
+			position: absolute;
+			right: -4px;
+			bottom: -4px;
+			width: 28px;
+			height: 21px;
+			border-radius: 4px;
+			box-shadow: 0 0 0 2px var(--ink), 0 1px 4px rgba(0, 0, 0, .5)
 		}
 
 		h1 {
@@ -128,12 +169,13 @@
 
 		.tab[aria-selected="true"] {
 			background: var(--field);
-			color: var(--gold);
-			border-color: var(--line)
+			color: var(--celeste);
+			border-color: var(--celeste-deep);
+			box-shadow: inset 0 2px 0 var(--celeste)
 		}
 
 		.tab:focus-visible {
-			outline: 2px solid var(--gold);
+			outline: 2px solid var(--celeste);
 			outline-offset: 2px
 		}
 
@@ -154,10 +196,50 @@
 			border-color: #5a2630
 		}
 
+		/* ---- Argentina icon helpers ---- */
+		.ico {
+			display: inline-block;
+			flex: none;
+			fill: currentColor;
+			vertical-align: middle
+		}
+
+		.ico-sun {
+			color: var(--gold)
+		}
+
+		.ico-mate {
+			color: var(--celeste)
+		}
+
+		.ico-stars {
+			color: var(--gold)
+		}
+
+		.ico-flag-badge {
+			width: 16px;
+			height: 12px;
+			border-radius: 2px;
+			box-shadow: 0 0 0 1px var(--line)
+		}
+
+		.flagname {
+			display: inline-flex;
+			align-items: center;
+			gap: 5px
+		}
+
+		.flagname.argy {
+			color: var(--celeste);
+			font-weight: 700
+		}
+
 		main {
 			max-width: 1180px;
 			margin: 0 auto;
-			padding: 18px 14px
+			padding: 18px 14px;
+			position: relative;
+			z-index: 1
 		}
 
 		.hint {
@@ -172,11 +254,94 @@
 			font-weight: 600
 		}
 
+		/* ---- Argentina banner ---- */
+		.arg-banner {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			background: linear-gradient(90deg, rgba(127, 196, 240, .16), rgba(242, 193, 78, .08));
+			border: 1px solid var(--celeste-deep);
+			border-radius: 12px;
+			padding: 12px 16px;
+			margin: 0 0 16px
+		}
+
+		.arg-banner .ico-sun {
+			width: 36px;
+			height: 36px
+		}
+
+		.arg-banner .ico-flag {
+			width: 30px;
+			height: 22px;
+			border-radius: 3px;
+			box-shadow: 0 0 0 1px var(--line)
+		}
+
+		.arg-banner .arg-text {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			line-height: 1.35
+		}
+
+		.arg-banner .arg-text strong {
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .04em;
+			font-size: 15px;
+			color: var(--celeste)
+		}
+
+		.arg-banner .arg-text span {
+			font-size: 12.5px;
+			color: var(--muted)
+		}
+
 		/* ---- groups grid ---- */
 		.grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
 			gap: 16px
+		}
+
+		.grid-featured {
+			grid-template-columns: repeat(auto-fit, minmax(380px, 1fr))
+		}
+
+		.other-groups {
+			margin-top: 22px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 4px 14px 14px
+		}
+
+		.other-groups summary {
+			cursor: pointer;
+			padding: 12px 0;
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			font-size: 14px;
+			color: var(--muted);
+			list-style: none;
+		}
+
+		.other-groups summary::-webkit-details-marker {
+			display: none
+		}
+
+		.other-groups summary::before {
+			content: "▸ ";
+			color: var(--gold)
+		}
+
+		.other-groups[open] summary::before {
+			content: "▾ "
+		}
+
+		.other-groups .grid {
+			margin-top: 10px
 		}
 
 		.group {
@@ -215,6 +380,77 @@
 			letter-spacing: .06em;
 			font-size: 14px;
 			color: var(--muted)
+		}
+
+		.gflag {
+			width: 28px;
+			height: 20px;
+			object-fit: cover;
+			border-radius: 3px;
+			box-shadow: 0 0 0 1px var(--line);
+			flex: none;
+			margin-left: auto
+		}
+
+		/* ---- Group J (Argentina) accent ---- */
+		.group.grp-arg {
+			border-color: var(--celeste-deep);
+			box-shadow: 0 0 0 1px var(--celeste-deep), 0 0 18px -6px var(--celeste-deep)
+		}
+
+		.group.grp-arg .gbadge {
+			background: var(--celeste);
+			color: var(--ink)
+		}
+
+		.arg-strip {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 7px 14px;
+			background: rgba(127, 196, 240, .10);
+			border-bottom: 1px solid var(--celeste-deep);
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .05em;
+			font-size: 12px;
+			color: var(--celeste)
+		}
+
+		.arg-strip .ico-flag,
+		.arg-strip .gflag,
+		.can-strip .gflag {
+			width: 20px;
+			height: 15px;
+			border-radius: 2px;
+			box-shadow: 0 0 0 1px var(--line);
+			flex: none;
+			margin-left: 0
+		}
+
+		/* ---- Group B (Canada) accent ---- */
+		.group.grp-can {
+			border-color: var(--canada-red-deep);
+			box-shadow: 0 0 0 1px var(--canada-red-deep), 0 0 18px -6px var(--canada-red-deep)
+		}
+
+		.group.grp-can .gbadge {
+			background: var(--canada-red);
+			color: var(--text)
+		}
+
+		.can-strip {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 7px 14px;
+			background: rgba(213, 43, 30, .10);
+			border-bottom: 1px solid var(--canada-red-deep);
+			font-family: var(--display);
+			text-transform: uppercase;
+			letter-spacing: .05em;
+			font-size: 12px;
+			color: #ff8478
 		}
 
 		/* ---- standings ---- */
@@ -274,7 +510,7 @@
 		.standings .pts {
 			font-family: var(--display);
 			font-weight: 700;
-			color: var(--gold);
+			color: var(--celeste);
 			font-size: 15px
 		}
 
@@ -325,11 +561,24 @@
 
 		.match {
 			padding: 7px 4px 4px;
-			border-top: 1px solid rgba(34, 66, 95, .4)
+			border-top: 1px solid rgba(34, 66, 95, .4);
+			border-left: 3px solid transparent;
+			margin-left: -3px;
+			padding-left: 7px
 		}
 
 		.match:first-of-type {
 			border-top: none
+		}
+
+		.match.acc-arg {
+			border-left-color: var(--celeste);
+			background: rgba(127, 196, 240, .06)
+		}
+
+		.match.acc-can {
+			border-left-color: var(--canada-red);
+			background: rgba(213, 43, 30, .07)
 		}
 
 		.cap {
@@ -411,7 +660,7 @@
 		}
 
 		.side:focus-visible {
-			outline: 2px solid var(--gold);
+			outline: 2px solid var(--celeste);
 			outline-offset: 2px
 		}
 
@@ -460,7 +709,7 @@
 
 		.mini:hover {
 			color: var(--text);
-			border-color: var(--gold)
+			border-color: var(--celeste)
 		}
 
 		.mini:disabled {
@@ -494,7 +743,7 @@
 			text-transform: uppercase;
 			letter-spacing: .06em;
 			font-size: 12px;
-			color: var(--gold);
+			color: var(--celeste);
 			margin: 0 0 2px;
 			text-align: center;
 			position: sticky;
@@ -605,6 +854,36 @@
 			margin-top: 2px
 		}
 
+		.champ .ico-stars {
+			display: block;
+			width: 84px;
+			height: auto;
+			margin: 6px auto 4px
+		}
+
+		.champ .champ-cap {
+			display: block;
+			font-size: 10.5px;
+			letter-spacing: .08em;
+			color: var(--muted);
+			margin-bottom: 6px
+		}
+
+		.champ.champ-arg b {
+			color: var(--celeste);
+			text-shadow: 0 0 14px rgba(127, 196, 240, .5)
+		}
+
+		.champ .champ-phrase {
+			display: block;
+			margin-top: 6px;
+			font-family: var(--display);
+			text-transform: none;
+			letter-spacing: normal;
+			font-size: 13px;
+			color: var(--gold)
+		}
+
 		@media (max-width:480px) {
 
 			.standings td:first-child,
@@ -623,6 +902,23 @@
 			.grid {
 				grid-template-columns: 1fr
 			}
+
+			.arg-banner {
+				flex-direction: column;
+				text-align: center;
+				padding: 12px
+			}
+
+			.bg-sun {
+				width: 90vw;
+				height: 90vw;
+				opacity: .04
+			}
+
+			footer {
+				flex-direction: column;
+				gap: 4px
+			}
 		}
 
 		@media (prefers-reduced-motion:reduce) {
@@ -630,14 +926,131 @@
 				transition: none !important
 			}
 		}
+
+		/* ---- footer ---- */
+		footer {
+			max-width: 1180px;
+			margin: 28px auto 0;
+			padding: 16px 14px 0;
+			border-top: 1px solid var(--line);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			text-align: center;
+			color: var(--muted);
+			font-size: 12.5px;
+			line-height: 1.6;
+			position: relative;
+			z-index: 1
+		}
+
+		footer .ico-sun {
+			width: 22px;
+			height: 22px
+		}
+
+		footer .ico-mate {
+			width: 24px;
+			height: 24px
+		}
+
+		footer strong {
+			color: var(--celeste)
+		}
 	</style>
 </head>
 
 <body>
+	<svg width="0" height="0" style="position:absolute;display:none" aria-hidden="true">
+		<!-- Sol de Mayo -->
+		<symbol id="ic-sun" viewBox="0 0 100 100">
+			<g fill="currentColor">
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(22.5 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(45 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(67.5 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(90 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(112.5 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(135 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(157.5 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(180 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(202.5 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(225 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(247.5 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(270 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(292.5 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(315 50 50)" />
+				<path d="M50 2 L57 16 L50 22 L43 16 Z" transform="rotate(337.5 50 50)" />
+				<circle cx="50" cy="50" r="24" />
+			</g>
+			<g>
+				<circle cx="42" cy="46" r="3.4" fill="#071c33" />
+				<circle cx="58" cy="46" r="3.4" fill="#071c33" />
+				<path d="M40 58 Q50 66 60 58" stroke="#071c33" stroke-width="3" fill="none" stroke-linecap="round" />
+			</g>
+		</symbol>
+
+		<!-- Argentina flag with Sol de Mayo -->
+		<symbol id="ic-flag" viewBox="0 0 30 20">
+			<rect width="30" height="20" fill="#fff" />
+			<rect width="30" height="6.667" fill="#75AADB" />
+			<rect y="13.333" width="30" height="6.667" fill="#75AADB" />
+			<g transform="translate(15 10)">
+				<g fill="#F2C14E">
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" />
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" transform="rotate(45)" />
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" transform="rotate(90)" />
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" transform="rotate(135)" />
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" transform="rotate(180)" />
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" transform="rotate(225)" />
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" transform="rotate(270)" />
+					<path d="M0 -4 L1.2 -1.6 L0 0 L-1.2 -1.6 Z" transform="rotate(315)" />
+					<circle r="2.2" />
+				</g>
+				<g fill="#75AADB">
+					<circle cx="-0.7" cy="-0.4" r="0.45" />
+					<circle cx="0.7" cy="-0.4" r="0.45" />
+					<path d="M-0.7 0.7 Q0 1.3 0.7 0.7" stroke="#75AADB" stroke-width="0.45" fill="none"
+						stroke-linecap="round" />
+				</g>
+			</g>
+		</symbol>
+
+		<!-- Mate gourd + bombilla -->
+		<symbol id="ic-mate" viewBox="0 0 64 64">
+			<g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M20 24c0-6 5-11 12-11s12 5 12 11v16c0 8-6 14-12 14s-12-6-12-14z" fill="currentColor"
+					fill-opacity="0.15" />
+				<path d="M30 13 L42 4" />
+				<circle cx="43" cy="3" r="2.4" fill="currentColor" />
+				<path d="M24 24h16" stroke-opacity=".5" />
+			</g>
+		</symbol>
+
+		<!-- Three stars (Tricampeón) -->
+		<symbol id="ic-stars" viewBox="0 0 100 28">
+			<g fill="currentColor">
+				<path d="M14 1 L17.5 9.5 L27 10.3 L19.8 16.6 L22 26 L14 21 L6 26 L8.2 16.6 L1 10.3 L10.5 9.5 Z" />
+				<path d="M50 1 L53.5 9.5 L63 10.3 L55.8 16.6 L58 26 L50 21 L42 26 L44.2 16.6 L37 10.3 L46.5 9.5 Z" />
+				<path d="M86 1 L89.5 9.5 L99 10.3 L91.8 16.6 L94 26 L86 21 L78 26 L80.2 16.6 L73 10.3 L82.5 9.5 Z" />
+			</g>
+		</symbol>
+	</svg>
+	<svg class="bg-sun" viewBox="0 0 100 100" aria-hidden="true">
+		<use href="#ic-sun" />
+	</svg>
+
 	<header>
+		<div class="flag-stripe"></div>
 		<div class="titlerow">
 			<div class="brand">
-				<img class="avatar" src="pic.png" alt="App avatar">
+				<div class="avatar-wrap">
+					<img class="avatar" src="pic.png" alt="App avatar">
+					<svg class="avatar-flag ico" viewBox="0 0 30 20" aria-hidden="true">
+						<use href="#ic-flag" />
+					</svg>
+				</div>
 				<h1>World Cup <span class="y">2026</span> Tracker</h1>
 			</div>
 			<span class="saved" id="saved">Auto-saving</span>
@@ -651,10 +1064,27 @@
 	</header>
 
 	<main>
+		<div class="arg-banner">
+			<svg class="ico ico-sun" viewBox="0 0 100 100" aria-hidden="true">
+				<use href="#ic-sun" />
+			</svg>
+			<svg class="ico ico-flag" viewBox="0 0 30 20" aria-hidden="true">
+				<use href="#ic-flag" />
+			</svg>
+			<div class="arg-text">
+				<strong>¡Vamos Argentina!</strong>
+				<span>Muchachos, ahora nos volvimos a ilusionar — rumbo a la 4ª estrella.</span>
+			</div>
+		</div>
 		<section id="view-groups" role="tabpanel" aria-labelledby="tab-groups">
 			<p class="hint">Tap a team to add a goal — the higher score wins and the table re-sorts itself. Use <b>−</b>
-				to fix a slip or <b>Clear</b> to set a match back to unplayed. Equal scores count as a draw.</p>
-			<div class="grid" id="groups"></div>
+				to fix a slip or <b>Clear</b> to set a match back to unplayed. Equal scores count as a draw.
+				Fixtures involving <b>Canada</b> or <b>Argentina</b> are highlighted below.</p>
+			<div class="grid grid-featured" id="groups"></div>
+			<details class="other-groups">
+				<summary>The other losers</summary>
+				<div class="grid" id="other-groups"></div>
+			</details>
 		</section>
 
 		<section id="view-ko" role="tabpanel" aria-labelledby="tab-ko" hidden>
@@ -663,9 +1093,26 @@
 			<div class="ko-wrap">
 				<div class="ko-rounds" id="ko"></div>
 			</div>
-			<div class="champ">Champions<b id="champ">— — —</b></div>
+			<div class="champ" id="champWrap">
+				<svg class="ico ico-stars" viewBox="0 0 100 28" aria-hidden="true">
+					<use href="#ic-stars" />
+				</svg>
+				<span class="champ-cap">Tricampeones del Mundo — 1978 · 1986 · 2022</span>
+				Champions<b id="champ">— — —</b>
+				<span class="champ-phrase" id="champPhrase" hidden>¡Campeones del Mundo! Rumbo a la 4ª estrella</span>
+			</div>
 		</section>
 	</main>
+
+	<footer>
+		<svg class="ico ico-mate" viewBox="0 0 64 64" aria-hidden="true">
+			<use href="#ic-mate" />
+		</svg>
+		<span>Hecho con pasión albiceleste — <strong>¡Aguante Argentina!</strong></span>
+		<svg class="ico ico-sun" viewBox="0 0 100 100" aria-hidden="true">
+			<use href="#ic-sun" />
+		</svg>
+	</footer>
 
 	<script>
 		/* ---------------- DATA (from the wallchart) ---------------- */
@@ -757,6 +1204,10 @@
 
 		/* ---------------- GROUP RENDER ---------------- */
 		const groupsEl = document.getElementById('groups');
+		const othersEl = document.getElementById('other-groups');
+
+		/* Canada (Group B) and Argentina (Group J) are both index 0 in their group's team list */
+		const FEATURED_TEAM_IDX = { B: 0, J: 0 };
 
 		function matchScore(gk, idx) { return (state.g[gk] && state.g[gk][idx]) || null; }
 		function setScore(gk, idx, sc) {
@@ -784,15 +1235,20 @@
 		function renderGroup(gk) {
 			const g = GROUPS[gk];
 			let card = document.getElementById('grp-' + gk);
-			if (!card) { card = document.createElement('div'); card.className = 'group'; card.id = 'grp-' + gk; groupsEl.appendChild(card); }
+			if (!card) {
+				card = document.createElement('div'); card.className = 'group'; card.id = 'grp-' + gk;
+				const target = (gk === 'B' || gk === 'J') ? groupsEl : othersEl;
+				target.appendChild(card);
+			}
 			const st = computeStandings(gk);
 			let rows = st.map((r, p) => {
 				const cls = p === 0 ? 'q1' : p === 1 ? 'q2' : p === 2 ? 'q3' : '';
-				return `<tr class="${cls}"><td><span class="pos">${p + 1}</span><span class="tn">${r.name}</span></td>
+				return `<tr class="${cls}"><td><span class="pos">${p + 1}</span><span class="tn">${teamLabel(r.name)}</span></td>
       <td>${r.P}</td><td>${r.W}</td><td>${r.D}</td><td>${r.L}</td><td>${r.GD > 0 ? '+' : ''}${r.GD}</td>
       <td class="pts">${r.Pts}</td></tr>`;
 			}).join('');
 
+			const featuredIdx = FEATURED_TEAM_IDX[gk];
 			let matches = g.m.map((mm, idx) => {
 				const sc = matchScore(gk, idx);
 				const hN = g.teams[mm[0]], aN = g.teams[mm[1]];
@@ -804,12 +1260,16 @@
 					else { hCls += ' draw'; aCls += ' draw'; }
 				}
 				const hS = played ? sc.h : '–', aS = played ? sc.a : '–';
-				return `<div class="match" data-g="${gk}" data-i="${idx}">
+				let mCls = 'match';
+				if (featuredIdx !== undefined && (mm[0] === featuredIdx || mm[1] === featuredIdx)) {
+					mCls += gk === 'B' ? ' acc-can' : ' acc-arg';
+				}
+				return `<div class="${mCls}" data-g="${gk}" data-i="${idx}">
       <div class="cap">${mm[2]}</div>
       <div class="teams">
-        <button class="${hCls}" data-side="h"><span class="tname">${hN}</span><span class="sc">${hS}</span></button>
+        <button class="${hCls}" data-side="h"><span class="tname">${teamLabel(hN)}</span><span class="sc">${hS}</span></button>
         <span class="colon">:</span>
-        <button class="${aCls}" data-side="a"><span class="sc">${aS}</span><span class="tname">${aN}</span></button>
+        <button class="${aCls}" data-side="a"><span class="sc">${aS}</span><span class="tname">${teamLabel(aN)}</span></button>
       </div>
       <div class="ctrls">
         <button class="mini h" data-act="dec" data-s="h" ${played && sc.h > 0 ? '' : 'disabled'}>−</button>
@@ -819,8 +1279,20 @@
     </div>`;
 			}).join('');
 
+			const isArg = gk === 'J', isCan = gk === 'B';
+			card.classList.toggle('grp-arg', isArg);
+			card.classList.toggle('grp-can', isCan);
+			const gflag = isArg
+				? `<img class="gflag" src="flags/argentina.png" alt="Argentina flag">`
+				: isCan
+					? `<img class="gflag" src="flags/canada.png" alt="Canada flag">`
+					: '';
+			let strip = '';
+			if (isArg) strip = `<div class="arg-strip"><img class="gflag" src="flags/argentina.png" alt="Argentina flag">¡Vamos la Albiceleste!</div>`;
+			else if (isCan) strip = `<div class="can-strip"><img class="gflag" src="flags/canada.png" alt="Canada flag">Go Canada Go!</div>`;
 			card.innerHTML = `
-    <div class="ghead"><span class="gbadge">${gk}</span><span class="gtitle">Group ${gk}</span></div>
+    <div class="ghead"><span class="gbadge">${gk}</span><span class="gtitle">Group ${gk}</span>${gflag}</div>
+    ${strip}
     <table class="standings">
       <thead><tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -854,6 +1326,8 @@
 		/* ---------------- KNOCKOUT ---------------- */
 		const koEl = document.getElementById('ko');
 		const champEl = document.getElementById('champ');
+		const champWrapEl = document.getElementById('champWrap');
+		const champPhraseEl = document.getElementById('champPhrase');
 
 		/* tree: round r has 16/(2^r) matches. match m in round r has two feeders. */
 		function teamAt(round, slot) {
@@ -897,6 +1371,9 @@
 			const finalPick = state.koPicks['4-0'];
 			const champion = finalPick === 'a' ? (entrants[4][0]) : finalPick === 'b' ? (entrants[4][1]) : "";
 			champEl.textContent = champion || "— — —";
+			const isArgChamp = champion === 'Argentina';
+			champWrapEl.classList.toggle('champ-arg', isArgChamp);
+			champPhraseEl.hidden = !isArgChamp;
 		}
 
 		function koSlot(r, m, side, name, isWin, editable, teamIndex) {
@@ -909,6 +1386,13 @@
     ${input}<button class="pick" data-pick="1" title="Pick winner">✓</button></div>`;
 		}
 		function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+		function teamLabel(name) {
+			if (name === 'Argentina') {
+				return `<span class="flagname argy"><svg class="ico ico-flag-badge" viewBox="0 0 30 20" aria-hidden="true"><use href="#ic-flag"/></svg>${escapeHtml(name)}</span>`;
+			}
+			return escapeHtml(name);
+		}
 
 		koEl.addEventListener('click', e => {
 			const pick = e.target.closest('.pick'); if (!pick) return;
